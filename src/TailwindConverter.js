@@ -1,0 +1,733 @@
+
+import _ from 'lodash';
+import * as helpers from './helpers';
+
+module.exports = class TailwindConverter{
+
+    constructor($givencontent) {
+    
+            this.givenContent = '';
+
+            this.isCssClassesOnly = false;
+
+            this.changes = 0;
+
+            this.lastSearches = [];
+
+            this.mediaOptions = {
+                'xs' : 'sm',
+                'sm' : 'sm',
+                'md' : 'md',
+                'lg' : 'lg',
+                'xl' : 'xl',
+            };
+
+            this.grid = {
+                '1'  : '1/6',
+                '2'  : '1/5',
+                '3'  : '1/4',
+                '4'  : '1/3',
+                '5'  : '2/5',
+                '6'  : '1/2',
+                '7'  : '3/5',
+                '8'  : '2/3',
+                '9'  : '3/4',
+                '10' : '4/5',
+                '11' : '5/6',
+                '12' : 'full',
+            };
+
+            this.colors = {
+                'primary'   : 'blue',
+                'secondary' : 'grey',
+                'success'   : 'green',
+                'danger'    : 'red',
+                'warning'   : 'yellow',
+                'info'      : 'teal',
+                'light'     : 'grey-lightest',
+                'dark'      : 'black',
+                'white'     : 'white',
+                'muted'     : 'grey',
+            };
+
+            if($givencontent)
+            {
+                this.givenContent = $givencontent;
+            }
+
+            return this;
+      }
+
+
+      /**
+     * Set the content.
+     *
+     * @param string $content
+     *
+     * @return Converter
+     */
+    setContent($content)
+    {
+        this.givenContent = $content;
+
+        return this;
+    }
+
+    /**
+     * Is the given content a CSS content or HTML content.
+     *
+     * @param bool $value
+     *
+     * @return Converter
+     */
+    classesOnly($value)
+    {
+        this.isCssClassesOnly = $value;
+
+        return this;
+    }
+
+    /**
+     * Run the conversion.
+     *
+     * @return Converter
+     */
+    convert()
+    {
+        this.convertGeneral();
+        this.convertGrid();
+        this.convertBorders();
+        this.convertMediaObject();
+        this.convertColors();
+        this.convertDisplay();
+        this.convertSizing();
+        this.convertFlexElements();
+        this.convertSpacing();
+        this.convertText();
+        this.convertFloats();
+        this.convertPositioning();
+        this.convertVisibility();
+        this.convertAlerts();
+        this.convertVerticalAlignment();
+        this.convertBadges();
+        this.convertBreadcrumb();
+        this.convertButtons();
+        this.convertCards();
+        this.convertDropdowns();
+        this.convertForms();
+        this.convertInputGroups();
+        this.convertListGroups();
+        this.convertModals();
+        this.convertNavs();
+        this.convertPagination();
+
+        return this;
+    }
+
+    /**
+     * Get the converted content.
+     *
+     * @return string
+     */
+    get()
+    {
+        return this.givenContent;
+    }
+
+    /**
+     * Get the number of comitted changes.
+     *
+     * @return int
+     */
+    changes()
+    {
+        return this.changes;
+    }
+
+    /**
+     * Convert main elements.
+     *
+     * @return null
+     */
+    convertGeneral()
+    {
+        const $mainClasses = {
+                'container-fluid' : 'container mx-auto',
+                'container'       : 'container mx-auto',
+
+                //http://getbootstrap.com/docs/4.0/utilities/close-icon/
+                'close' : '',
+
+                //http://getbootstrap.com/docs/4.0/utilities/embed/
+                'embed-responsive'       : '',
+                'embed-responsive-item'  : '',
+                'embed-responsive-21by9' : '',
+                'embed-responsive-16by9' : '',
+                'embed-responsive-4by3'  : '',
+                'embed-responsive-1by1'  : '',
+
+                //http://getbootstrap.com/docs/4.0/utilities/image-replacement/
+                'text-hide' : '',
+
+                //http://getbootstrap.com/docs/4.0/utilities/screenreaders/
+                'sr-only'           : '',
+                'sr-only-focusable' : '',
+
+                //http://getbootstrap.com/docs/4.0/content/images/
+                'img-fluid'     : 'max-w-full h-auto',
+                'img-thumbnail' : 'max-w-full h-auto border-1 border-grey rounded p-1',
+
+                //http://getbootstrap.com/docs/4.0/content/tables/
+                'table'    : 'w-full max-w-full mb-4 bg-transparent',
+                'table-sm' : 'p-1',
+                // 'table-bordered' : '',
+                // 'table-striped' : '',
+                'table-responsive'                : 'block w-full overflow-auto scrolling-touch',
+                'table-responsive-{regex_string}' : 'block w-full overflow-auto scrolling-touch',
+
+                //http://getbootstrap.com/docs/4.0/content/figures/
+                'figure'         : 'inline-block mb-4',
+                'figure-img'     : 'mb-2 leading-none',
+                'figure-caption' : 'text-grey',
+
+                'fade'     : 'opacity-0',
+                'show'     : 'opacity-100 block', //need to be checked
+                'disabled' : 'opacity-75',
+
+                //http://getbootstrap.com/docs/4.0/components/collapse/
+                // 'collapse' : 'hidden',
+                'collapsing' : 'relative h-0 overflow-hidden ', //there should be a h-0
+
+                'close' : 'absolute pin-t pin-b pin-r px-4 py-3',
+
+                //http://getbootstrap.com/docs/4.0/components/jumbotron/
+                'jumbotron'       : 'py-8 px-4 mb-8 bg-grey-lighter rounded',
+                'jumbotron-fluid' : 'pr-0 pl-0 rounded-none',
+
+        };
+
+        const $mainClassesEachScreen = {
+                //name-{screen}-someting
+        };
+
+        _.each($mainClasses,($twClass,$btClass)=>this.searchAndReplace($btClass, $twClass))
+
+        _.each($mainClassesEachScreen,($twClass,$btClass)=>{
+            _.each(this.mediaOptions,($twMedia,$btMedia)=>{
+                this.searchAndReplace(
+                    $btMedia.replace($btClass,'{screen}'),
+                    $twMedia.replace($twMedia,'{screen}')
+                );
+            })
+        })
+    }
+
+    /**
+     * Convert grid elements.
+     *
+     * @return null
+     */
+    convertGrid()
+    {
+        this.searchAndReplace('row', 'flex flex-wrap');
+        this.searchAndReplace('col', 'flex-grow');
+
+        //col-(xs|sm|md|lg|xl) = (sm|md|lg|xl):flex-grow
+        //ml-(xs|sm|md|lg|xl)-auto = (sm|md|lg|xl):mx-auto:ml-auto
+        //mr-(xs|sm|md|lg|xl)-auto = (sm|md|lg|xl):mx-auto:mr-auto
+
+        _.each(this.mediaOptions,($twMedia,$btMedia)=>{
+
+            this.searchAndReplace('col-'+$btMedia, $twMedia+':flex-grow');
+            this.searchAndReplace('ml-'+$btMedia+'-auto', $twMedia+':ml-auto');
+            this.searchAndReplace('mr-'+$btMedia+'-auto', $twMedia+':mr-auto');
+
+            //col-btElem
+            //col-(xs|sm|md|lg|xl)-btElem = (sm|md|lg|xl):w-twElem
+            //offset-(xs|sm|md|lg|xl)-btElem = (sm|md|lg|xl):mx-auto
+            _.each(this.grid,($twElem,$btElem)=>{
+                if ($btMedia === 'xs') {
+                    this.searchAndReplace('col-'+$btElem, 'w-'+$twElem);
+                }
+
+                this.searchAndReplace('col-'+$btMedia+'-'+$btElem, $twMedia+':w-'+$twElem+' pr-4 pl-4');
+
+                //might work :)
+                this.searchAndReplace('offset-'+$btMedia+'-'+$btElem, $twMedia+':mx-'+$twElem);
+            })
+        })
+    }
+
+    convertMediaObject()
+    {
+        //http://getbootstrap.com/docs/4.0/layout/media-object/
+    }
+
+    convertBorders()
+    {
+
+        _.each({
+            'top' : 't',
+            'right' : 'r',
+            'bottom' : 'b',
+            'left' : 'l',
+        },($twSide,$btSide)=>{
+            this.searchAndReplace('border-'+$btSide, 'border-'+$twSide);
+            this.searchAndReplace('border-'+$btSide+'-0', 'border-'+$twSide+'-0');
+        })
+
+        _.each(this.colors,($twColor,$btColor)=>this.searchAndReplace('border-'+$btColor, 'border-'+$twColor));
+
+        _.each({
+            'top' : 't',
+            'right' : 'r',
+            'bottom' : 'b',
+            'left' : 'l',
+            'circle' : 'full',
+            '0' : 'none',
+        },($twStyle,$btStyle)=>this.searchAndReplace('rounded-'+$btStyle, 'rounded-'+$twStyle));
+        
+    }
+
+    convertColors()
+    {
+        _.each(this.colors,($twColor,$btColor)=>{
+            this.searchAndReplace('text-'+$btColor, 'text-'+$twColor);
+            this.searchAndReplace('bg-'+$btColor, 'bg-'+$twColor);
+            this.searchAndReplace('table-'+$btColor, 'bg-'+$twColor);
+            // this.searchAndReplace('bg-gradient-'+$btColor, 'bg-'+$twColor);
+        })
+    }
+
+    convertDisplay()
+    {
+        //.d-none
+        //.d-{sm,md,lg,xl}-none
+
+        _.each({
+            'none' : 'hidden',
+            'inline' : 'inline',
+            'inline-block' : 'inline-block',
+            'block' : 'block',
+            'table' : 'table',
+            'table-cell' : 'table-cell',
+            'flex' : 'flex',
+            'inline-flex' : 'inline-flex',
+            },($twElem,$btElem)=>{
+                this.searchAndReplace('d-'+$btElem, $twElem);
+
+                _.each(this.mediaOptions,($twMedia,$btMedia)=>this.searchAndReplace('d-'+$btMedia+'-'+$btElem, $twMedia+':'+$twElem));
+
+            })
+    }
+
+    convertFlexElements()
+    {
+        this.mediaOptions[''] = '';
+        _.each(this.mediaOptions,($twMedia,$btMedia)=>{
+
+            _.each(['row', 'row-reverse', 'col', 'col-reverse'],($key)=>this.searchAndReplace('flex'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-'+$key, (_.isEmpty($twMedia) ? '' : $twMedia+':')+'flex-'+$key));
+            _.each(['start', 'end', 'center', 'between', 'around'],($key)=>this.searchAndReplace('justify-content'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-'+$key, (_.isEmpty($twMedia) ? '' : $twMedia+':')+'justify-'+$key));
+            _.each(['start', 'end', 'center', 'stretch', 'baseline'],($key)=>this.searchAndReplace('align-items'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-'+$key, (_.isEmpty($twMedia) ? '' : $twMedia+':')+'align-'+$key));
+            _.each(['start', 'end', 'center', 'stretch', 'baseline'],($key)=>this.searchAndReplace('align-content'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-'+$key, (_.isEmpty($twMedia) ? '' : $twMedia+':')+'content-'+$key));
+            _.each(['start', 'end', 'center', 'stretch', 'baseline'],($key)=>this.searchAndReplace('align-self'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-'+$key, (_.isEmpty($twMedia) ? '' : $twMedia+':')+'self-'+$key));
+
+            this.searchAndReplace('flex'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-wrap', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'flex-wrap');
+            this.searchAndReplace('flex'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-wrap-reverse', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'flex-wrap-reverse');
+            this.searchAndReplace('flex'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-nowrap', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'flex-no-wrap');
+
+            this.searchAndReplace('flex'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-nowrap', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'flex-no-wrap');
+            _.each(_.range(1,12),($order)=>this.searchAndReplace('order'+(_.isEmpty($btMedia) ? '' : '-').$btMedia+'-'+$order, ''))
+        });
+
+    }
+
+    convertSizing()
+    {
+        _.each({
+            '25' : '1/4',
+            '50' : '1/2',
+            '75' : '3/4',
+            '100' : 'full',
+        },($twClass,$btClass)=>{
+            this.searchAndReplace('w-'+$btClass, 'w-'+$twClass);
+             //no percentages in TW for heights except for full
+             if ($btClass === '100') {
+                this.searchAndReplace('h-'+$btClass, 'h-'+$twClass);
+            }
+        })
+    
+        this.searchAndReplace('mw-100', 'max-w-full');
+        this.searchAndReplace('mh-100', 'max-h-full');
+    }
+
+    convertSpacing()
+    {
+        _.each(this.mediaOptions,($twMedia,$btMedia)=>{
+            this.searchAndReplace('m-'+$btMedia+'-{regex_number}', $twMedia+':m-{regex_number}');
+            this.searchAndReplace('m{regex_string}-'+$btMedia+'-{regex_number}', $twMedia+':m{regex_string}-{regex_number}');
+            this.searchAndReplace('p-'+$btMedia+'-{regex_number}', $twMedia+':p-{regex_number}');
+            this.searchAndReplace('p{regex_string}-'+$btMedia+'-{regex_number}', $twMedia+':p {regex_string}-{regex_number}');
+        })
+    }
+
+    convertText()
+    {
+        this.mediaOptions[''] = '';
+        _.each(this.mediaOptions,($twMedia,$btMedia)=>{
+            this.searchAndReplace('text'+(_.isEmpty($btMedia) ? '' : '-')+'-'+$btMedia+'-left', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'text-left');
+            this.searchAndReplace('text'+(_.isEmpty($btMedia) ? '' : '-')+'-'+$btMedia+'-right', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'text-right');
+            this.searchAndReplace('text'+(_.isEmpty($btMedia) ? '' : '-')+'-'+$btMedia+'-center', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'text-center');
+            this.searchAndReplace('text'+(_.isEmpty($btMedia) ? '' : '-')+'-'+$btMedia+'-justify', (_.isEmpty($twMedia) ? '' : $twMedia+':')+'text-justify');
+        })
+
+        this.searchAndReplace('text-nowrap', 'whitespace-no-wrap');
+        this.searchAndReplace('text-truncate', 'truncate');
+
+        this.searchAndReplace('text-lowercase', 'lowercase');
+        this.searchAndReplace('text-uppercase', 'uppercase');
+        this.searchAndReplace('text-capitalize', 'capitalize');
+
+        this.searchAndReplace('initialism', '');
+        this.searchAndReplace('lead', 'text-lg font-light');
+        this.searchAndReplace('small', 'text-sm');
+        this.searchAndReplace('mark', '');
+        this.searchAndReplace('display-1', 'text-xl');
+        this.searchAndReplace('display-2', 'text-2xl');
+        this.searchAndReplace('display-3', 'text-3xl');
+        this.searchAndReplace('display-4', 'text-4xl');
+
+        this.searchAndReplace('h-1', 'mb-2 font-medium leading-tight text-4xl');
+        this.searchAndReplace('h-2', 'mb-2 font-medium leading-tight text-3xl');
+        this.searchAndReplace('h-3', 'mb-2 font-medium leading-tight text-2xl');
+        this.searchAndReplace('h-4', 'mb-2 font-medium leading-tight text-xl');
+        this.searchAndReplace('h-5', 'mb-2 font-medium leading-tight text-lg');
+        this.searchAndReplace('h-6', 'mb-2 font-medium leading-tight text-base');
+
+        this.searchAndReplace('blockquote', 'mb-6 text-lg');
+        this.searchAndReplace('blockquote-footer', 'block text-grey');
+
+        this.searchAndReplace('font-weight-bold', 'font-bold');
+        this.searchAndReplace('font-weight-normal', 'font-normal');
+        this.searchAndReplace('font-weight-light', 'font-light');
+        this.searchAndReplace('font-italic', 'italic');
+    }
+
+    convertFloats()
+    {
+       _.each(this.mediaOptions,($twMedia,$btMedia)=>
+            _.each(['left', 'right', 'none'],($alignment)=>
+                this.searchAndReplace('float-'+$btMedia+'-'+$alignment, $twMedia+':float-'+$alignment)));
+        
+    }
+
+    convertPositioning()
+    {
+        _.each({
+            'position-static' : 'static',
+            'position-relative' : 'relative',
+            'position-absolute' : 'absolute',
+            'position-fixed' : 'fixed',
+            'position-sticky' : '',
+            'fixed-top' : 'pin-t',
+            'fixed-bottom' : 'pin-b',
+        },($twPosition,$btPosition)=>this.searchAndReplace($btPosition, $twPosition));
+    }
+
+    convertVerticalAlignment()
+    {
+        //same
+        // foreach ([
+        //     'baseline', 'top', 'middle', 'bottom', 'text-top', 'text-bottom'
+        // ] as $btAlign: $twAlign) {
+        //     this.searchAndReplace('align-'+$btAlign, 'align-'+$twAlign);
+        // }
+    }
+
+    convertVisibility()
+    {
+        //same
+    }
+
+    convertAlerts()
+    {
+        this.searchAndReplace('alert', 'relative px-3 py-3 mb-4 border rounded');
+        this.searchAndReplace('alert-heading', ''); //color: inherit
+        this.searchAndReplace('alert-link', 'font-bold no-underline');
+        this.searchAndReplace('alert-dismissible', '');
+
+        _.each(this.colors,($twColor,$btColor)=>this.searchAndReplace('alert-'+$btColor, 'text-'+$twColor+'-darker'+' border-'+$twColor+'-dark bg-'+$twColor+'-lighter'))
+    }
+
+    convertBadges()
+    {
+        this.searchAndReplace('badge', 'inline-block p-1 text-center font-semibold text-sm align-baseline leading-none rounded');
+        this.searchAndReplace('badge-pill', 'rounded-full py-1 px-3');
+
+        _.each(this.colors,($twColor,$btColor)=>{
+            if ($btColor === 'dark') {
+                this.searchAndReplace('badge-'+$btColor, 'text-white bg-black');
+            } else if ($btColor == 'light') {
+                this.searchAndReplace('badge-'+$btColor, 'text-black bg-grey-light');
+            } else {
+                this.searchAndReplace('badge-'+$btColor, 'text-'+$twColor+'-darker'+' bg-'+$twColor+'-light');
+            }
+        });
+    }
+
+    convertBreadcrumb()
+    {
+        this.searchAndReplace('breadcrumb', 'flex flex-wrap list-reset pt-3 pb-3 py-4 px-4 mb-4 bg-grey-light rounded');
+        this.searchAndReplace('breadcrumb-item', 'inline-block px-2 py-2 text-grey-dark');
+    }
+
+    convertButtons()
+    {
+        this.searchAndReplace('btn', 'inline-block align-middle text-center select-none border font-normal whitespace-no-wrap py-2 px-4 rounded text-base leading-normal no-underline');
+        this.searchAndReplace('btn-group', 'relative inline-flex align-middle');
+        this.searchAndReplace('btn-group-vertical', 'relative inline-flex align-middle flex-col items-start justify-center');
+        this.searchAndReplace('btn-toolbar', 'flex flex-wrap justify-start');
+        this.searchAndReplace('btn-link', 'font-normal blue bg-transparent');
+        this.searchAndReplace('btn-block', 'block w-full');
+
+        _.each({
+            'sm' : 'py-1 px-2 text-sm leading-tight',
+            'lg' : 'py-3 px-4 text-xl leading-tight',
+        },($twClasses,$btMedia)=>{
+            this.searchAndReplace('btn-'+$btMedia, $twClasses);
+            this.searchAndReplace('btn-group-'+$btMedia, $twClasses);
+        })
+        
+        _.each(this.colors,($twColor,$btColor)=>{
+            this.searchAndReplace('btn-'+$btColor, 'text-'+$twColor+'-lightest bg-'+$twColor+' hover:bg-'+$twColor+'-light');
+            this.searchAndReplace('btn-outline-'+$btColor, 'text-'+$twColor+'-dark border-'+$twColor+' bg-white hover:bg-'+$twColor+'-light hover:text-'+$twColor+'-darker');          
+        });
+    }
+
+    convertCards()
+    {
+        this.searchAndReplace('card', 'relative flex flex-col min-w-0 rounded break-words border bg-white border-1 border-grey-light');
+        this.searchAndReplace('card-body', 'flex-auto p-6');
+        this.searchAndReplace('card-title', 'mb-3');
+        this.searchAndReplace('card-text', 'mb-0');
+        this.searchAndReplace('card-subtitle', '-mt-2 mb-0');
+        this.searchAndReplace('card-link', 'ml-6');
+        this.searchAndReplace('card-header', 'py-3 px-6 mb-0 bg-grey-lighter border-b-1 border-grey-light text-grey-darkest');
+        this.searchAndReplace('card-footer', 'py-3 px-6 bg-grey-lighter border-t-1 border-grey-light');
+        this.searchAndReplace('card-header-tabs', 'border-b-0 -ml-2 -mb-3');
+        this.searchAndReplace('card-header-pills', '-ml-3 -mr-3');
+        this.searchAndReplace('card-img-overlay', 'absolute pin-y pin-x p-6');
+        this.searchAndReplace('card-img', 'w-full rounded');
+        this.searchAndReplace('card-img-top', 'w-full rounded rounded-t');
+        this.searchAndReplace('card-img-bottom', 'w-full rounded rounded-b');
+        this.searchAndReplace('card-deck', 'flex flex-col sm:flex-wrap sm:-ml-1 sm:-mr-1');
+        this.searchAndReplace('card-group', 'flex flex-col');
+    }
+
+    convertDropdowns()
+    {
+        this.searchAndReplace('dropdown', 'relative');
+        this.searchAndReplace('dropup', 'relative');
+        this.searchAndReplace('dropdown-toggle', ' inline-block w-0 h-0 ml-1 align border-b-0 border-t-1 border-r-1 border-l-1');
+        this.searchAndReplace('dropdown-menu', ' absolute pin-l z-50 float-left hidden list-reset	 py-2 mt-1 text-base bg-white border border-grey-light rounded');
+        this.searchAndReplace('dropdown-divider', 'h-0 my-2 overflow-hidden border-t-1 border-grey-light');
+        this.searchAndReplace('dropdown-item', 'block w-full py-1 px-6 font-normal text-grey-darkest whitespace-no-wrap border-0');
+        this.searchAndReplace('dropdown-header', 'block py-2 px-6 mb-0 text-sm text-greay-dark whitespace-no-wrap');
+    }
+
+    convertForms()
+    {
+        this.searchAndReplace('form-group', 'mb-4');
+        this.searchAndReplace('form-control', 'block appearance-none w-full py-1 px-2 mb-1 text-base leading-normal bg-white text-grey-darker border border-grey rounded');
+        this.searchAndReplace('form-control-lg', 'py-2 px-4 text-lg leading-normal rouned');
+        this.searchAndReplace('form-control-sm', 'py-1 px-2 text-sm leading-normal rouned');
+        this.searchAndReplace('form-control-file', 'block appearance-none');
+        this.searchAndReplace('form-control-range', 'block appearance-none');
+
+        this.searchAndReplace('form-inline', 'flex items-center');
+
+        this.searchAndReplace('col-form-label', 'pt-2 pb-2 mb-0 leading-normal');
+        this.searchAndReplace('col-form-label-lg', 'pt-3 pb-3 mb-0 leading-normal');
+        this.searchAndReplace('col-form-label-sm', 'pt-1 pb-1 mb-0 leading-normal');
+
+        this.searchAndReplace('col-form-legend', 'pt-2 pb-2 mb-0 text-base');
+        this.searchAndReplace('col-form-plaintext', 'pt-2 pb-2 mb-0 leading-normal bg-transparent border-transparent border-r-0 border-l-0 border-t-1 border-b-1');
+
+        this.searchAndReplace('form-text', 'block mt-1');
+        this.searchAndReplace('form-row', 'flex flex-wrap -mr-1 -ml-1');
+        this.searchAndReplace('form-check', 'relative block mb-2');
+        this.searchAndReplace('form-check-label', 'text-grey-dark pl-6 mb-0');
+        this.searchAndReplace('form-check-input', 'absolute mt-1 -ml-6');
+
+        this.searchAndReplace('form-check-inline', 'inline-block mr-2');
+        this.searchAndReplace('valid-feedback', 'hidden mt-1 text-sm text-green');
+        this.searchAndReplace('valid-tooltip', 'absolute z-10 hidden w-4 font-normal leading-noraml text-white rounded p-2 bg-green-dark');
+        this.searchAndReplace('is-valid', 'bg-green-dark');
+        this.searchAndReplace('invalid-feedback', 'hidden mt-1 text-sm text-red');
+        this.searchAndReplace('invalid-tooltip', 'absolute z-10 hidden w-4 font-normal leading-noraml text-white rounded p-2 bg-red-dark');
+        this.searchAndReplace('is-invalid', 'bg-red-dark');
+    }
+
+    convertInputGroups()
+    {
+        this.searchAndReplace('input-group', 'relative flex items-stretch w-full');
+        this.searchAndReplace('input-group-addon', 'py-1 px-2 mb-1 text-base font-normal leading-normal text-grey-darkest text-center bg-grey-light border border-4 border-grey-lighter rounded');
+        this.searchAndReplace('input-group-addon-lg', 'py-2 px-3 mb-0 text-lg');
+        this.searchAndReplace('input-group-addon-sm', 'py-3 px-4 mb-0 text-lg');
+    }
+
+    convertListGroups()
+    {
+        this.searchAndReplace('list-group', 'flex flex-col pl-0 mb-0 border rounded border-grey-light');
+        this.searchAndReplace('list-group-item-action', 'w-fill');
+        this.searchAndReplace('list-group-item', 'relative block py-3 px-6 -mb-px border border-r-0 border-l-0 border-grey-light no-underline');
+        this.searchAndReplace('list-group-flush', '');
+        _.each(this.colors,($twColor,$btColor)=>{
+            if ($btColor === 'dark') {
+                this.searchAndReplace('list-group-item-'+$btColor, 'text-white bg-grey-dark');
+            } else if ($btColor == 'light') {
+                this.searchAndReplace('list-group-item-'+$btColor, 'text-black bg-grey-light');
+            } else {
+                this.searchAndReplace('list-group-item-'+$btColor, 'bg-'+$twColor+'-lighter text-'+$twColor+'-darkest');
+            }         
+        });
+        
+    }
+
+    convertModals()
+    {
+        //TODO
+    }
+
+    convertNavs()
+    {
+        this.searchAndReplace('nav', 'flex flex-wrap list-reset pl-0 mb-0');
+        this.searchAndReplace('nav-tabs', 'border border-t-0 border-r-0 border-l-0 border-b-1 border-grey-light');
+        this.searchAndReplace('nav-pills', '');
+        this.searchAndReplace('nav-fill', '');
+        this.searchAndReplace('nav-justified', '');
+
+        let $navLinkClasses = 'inline-block py-2 px-4 no-underline';
+        let $navItemClasses = '';
+
+        if (this.isInLastSearches('nav-tabs', 5)) {
+            $navLinkClasses += ' border border-b-0 mx-1 rounded rounded-t';
+            $navItemClasses += '-mb-px';
+        }
+
+        if (this.isInLastSearches('nav-pills', 5)) {
+            $navLinkClasses += ' border border-blue bg-blue rounded text-white mx-1';
+        }
+
+        if (this.isInLastSearches('nav-fill', 5)) {
+            $navItemClasses += ' flex-auto text-center';
+        }
+
+        if (this.isInLastSearches('nav-justified', 5)) {
+            $navItemClasses += ' flex-grow text-center';
+        }
+
+        this.searchAndReplace('nav-link', $navLinkClasses);
+        this.searchAndReplace('nav-item', $navItemClasses);
+
+        this.searchAndReplace('navbar', 'relative flex flex-wrap items-center content-between py-2 px-4');
+        this.searchAndReplace('navbar-brand', 'inline-block pt-1 pb-1 mr-4 text-lg whitespace-nowrap');
+        this.searchAndReplace('navbar-nav', 'flex flex-wrap list-reset pl-0 mb-0');
+        this.searchAndReplace('navbar-text', 'inline-block pt-2 pb-2');
+        this.searchAndReplace('navbar-collapse', 'flex-grow items-center');
+        this.searchAndReplace('navbar-expand', 'flex-no-wrap content-start');
+        this.searchAndReplace('navbar-expand-{regex_string}', '');
+        this.searchAndReplace('navbar-toggler', 'py-1 px-2 text-md leading-normal bg-transparent border border-transparent rounded');
+    }
+
+    convertPagination()
+    {
+        this.searchAndReplace('pagination', 'flex list-reset pl-0 rounded');
+        this.searchAndReplace('pagination-lg', 'text-xl');
+        this.searchAndReplace('pagination-sm', 'text-sm');
+        this.searchAndReplace('page-link', 'relative block py-2 px-3 -ml-px leading-normal text-blue bg-white border border-grey no-underline hover:text-blue-darker hover:bg-grey-light');
+        // this.searchAndReplace('page-link', 'relative block py-2 px-3 -ml-px leading-normal text-blue bg-white border border-grey');
+    }
+
+    /**
+     * search for a word in the last searches.
+     *
+     * @param string $searchFor
+     * @param int    $limitLast limit the search to last $limitLast items
+     *
+     * @return bool
+     */
+    isInLastSearches($searchFor, $limitLast = 0)
+    {
+       let $i = 0;
+       let $return;
+        _.each(this.lastSearches,($search)=>{
+            if (_.includes($search, $searchFor)) {
+                $return = true;
+                return false;
+            }
+
+            if ($i++ >= $limitLast && $limitLast > 0) {
+                $return = false;
+                return false;
+            }
+        })
+        return $return;
+    }
+
+    /**
+     * Search the given content and replace.
+     *
+     * @param string $search
+     * @param string $replace
+     *
+     * @return null
+     */
+    searchAndReplace($_search, $replace)
+    {
+        let $currentContent = this.givenContent;
+
+        let $regexStart = !this.isCssClassesOnly ? '(?<start>class\s*=\s*["\'].*?)' : '(?<start>\s*)';
+        let $regexEnd = !this.isCssClassesOnly ? '(?<end>.*?["\'])' : '(?<end>\s*)';
+
+        let $search = helpers.preg_quote($_search);
+
+        let $currentSubstitute = 0;
+
+        while (true) {
+            if($search.indexOf('\{regex_string\}') !== -1 || $search.indexOf('\{regex_number\}') !== -1)
+            {
+                _.each({'regex_string': '[a-zA-Z0-9]+', 'regex_number' : '[0-9]+'},($regexValue,$regeName)=>{
+                    $currentSubstitute++;
+                    $search = $search.replace(new RegExp('/\\\{'+$regeName+'\\\}/'),'(?<'+$regeName+'_'+$currentSubstitute+'>'+$regexValue+')');
+                    $replace = $replace.replace(new RegExp('/{'+$regeName+'\}/'), '${'+$regeName+'_'+$currentSubstitute+'}');
+                })
+                continue;
+            }
+            break;
+        }
+
+        //class=" given given-md something-given-md"
+        this.givenContent = helpers.preg_replace_callback(
+            '/'+$regexStart+'(?<given>(?<![\-_.\w\d])'+$search+'(?![\-_.\w\d]))'+$regexEnd+'/i',
+             ($match) => {
+                $replace = helpers.preg_replace_callback('/\$\{regex_(\w+)_(\d+)\}/', ($m) => {
+                    return $match['regex_'+$m[1]+'_'+$m[2]];
+                }, $replace);
+
+                return $match.groups['start']+$replace+$match.groups['end'];
+            },
+            this.givenContent
+        );
+
+        if ($currentContent.localeCompare(this.givenContent) !== 0) {
+            this.changes++;
+
+            this.lastSearches.push(helpers.stripslashes($search));
+
+            if (this.lastSearches.length >= 10) {
+                this.lastSearches = this.lastSearches.slice( -10, 10);
+            }
+        }
+    }
+}

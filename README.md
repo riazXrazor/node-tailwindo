@@ -1,10 +1,5 @@
 # Tailwindo
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/awssat/tailwindo.svg?style=flat-square)](https://packagist.org/packages/awssat/tailwindo)
-[![StyleCI](https://styleci.io/repos/110390721/shield?branch=master)](https://styleci.io/repos/110390721)
-[![Build Status](https://img.shields.io/travis/awssat/tailwindo/master.svg?style=flat-square)](https://travis-ci.org/awssat/tailwindo)
-
-
 <p align="center">
   <img src="https://pbs.twimg.com/media/DQ-mDgSX0AUpCPL.png">
 </p>
@@ -18,7 +13,7 @@ This tool can convert Boostrap CSS classes in HTML code to equivalent Tailwind C
 
 You can install the package via composer globally:
 
-`$ composer global require awssat/tailwindo`
+`$ npm i -g tailwindo`
 
 Then use it to convert a snippet, a file or a folder.
 
@@ -58,7 +53,7 @@ $ tailwindo 'alert alert-info'
 Or html:
 
 ```bash
-$ tailwindo '<div class="alert alert-info mb-2 mt-3">hi</div>'
+$ tailwindo '<div class=\"alert alert-info mb-2 mt-3\">hi</div>'
 ```
 
 ### Convert a file
@@ -73,20 +68,17 @@ This option works with the `--replace=true` option
 You can install the package via composer locally in your project folder:
 
 ```bash 
-$ composer require awssat/tailwindo
+$ npm i tailwindo
 ```
 
 Then use it like this: 
 
 ```php
-use Awssat\Tailwindo\Converter;
+const tailwindo = require('tailwindo');
 
 $input = '<div class="alert alert-danger">hi</div>'; //BootstrapCSS code
 
-$output = (new Converter)
-            ->setContent($input)
-            ->convert()
-            ->get(); // gets converted code
+$output = tailwindo($input) // gets converted code
 ```
 
 

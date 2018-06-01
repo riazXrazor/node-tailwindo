@@ -4,9 +4,10 @@
   <img src="https://pbs.twimg.com/media/DQ-mDgSX0AUpCPL.png">
 </p>
                                                                          
-
+javascript version of https://github.com/awssat/tailwindo
 
 This tool can convert Boostrap CSS classes in HTML code to equivalent Tailwind CSS classes, still not perfect but good as a helper tool.
+
 
 
 ## Installing `tailwindo` for CLI use

@@ -1,6 +1,6 @@
 {
   "name": "tailwindo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Convert Bootstrap CSS code to Tailwind CSS code",
   "main": "index.js",
   "bin": "cli.js",

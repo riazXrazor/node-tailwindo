@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as helpers from './helpers';
+const XRegExp = require('xregexp');
 
 module.exports = class TailwindConverter{
 
@@ -688,18 +689,18 @@ module.exports = class TailwindConverter{
 
         let $regexStart = !this.isCssClassesOnly ? '(?<start>class\s*=\s*["\'].*?)' : '(?<start>\s*)';
         let $regexEnd = !this.isCssClassesOnly ? '(?<end>.*?["\'])' : '(?<end>\s*)';
-
-        let $search = helpers.preg_quote($_search);
+        
+        let $search = $_search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 
         let $currentSubstitute = 0;
-
+        
         while (true) {
             if($search.indexOf('\{regex_string\}') !== -1 || $search.indexOf('\{regex_number\}') !== -1)
             {
                 _.each({'regex_string': '[a-zA-Z0-9]+', 'regex_number' : '[0-9]+'},($regexValue,$regeName)=>{
                     $currentSubstitute++;
-                    $search = $search.replace(new RegExp('/\\\{'+$regeName+'\\\}/'),'(?<'+$regeName+'_'+$currentSubstitute+'>'+$regexValue+')');
-                    $replace = $replace.replace(new RegExp('/{'+$regeName+'\}/'), '${'+$regeName+'_'+$currentSubstitute+'}');
+                    $search = XRegExp.replace($search,XRegExp('/\\\{'+$regeName+'\\\}/'),'(?<'+$regeName+'_'+$currentSubstitute+'>'+$regexValue+')');
+                    $replace = XRegExp.replace($replace,XRegExp('/{'+$regeName+'\}/'), '${'+$regeName+'_'+$currentSubstitute+'}');
                 })
                 continue;
             }
@@ -718,7 +719,7 @@ module.exports = class TailwindConverter{
                     return $match['regex_'+$m[1]+'_'+$m[2]];
                 }, $replace);
 
-                return $match.groups['start']+$replace+$match.groups['end'];
+                return $match['start']+$replace+$match['end'];
             },
             this.givenContent
         );

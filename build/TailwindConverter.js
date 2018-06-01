@@ -18,6 +18,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var XRegExp = require('xregexp');
+
 module.exports = function () {
     function TailwindConverter($givencontent) {
         _classCallCheck(this, TailwindConverter);
@@ -765,7 +767,7 @@ module.exports = function () {
             var $regexStart = !this.isCssClassesOnly ? '(?<start>class\s*=\s*["\'].*?)' : '(?<start>\s*)';
             var $regexEnd = !this.isCssClassesOnly ? '(?<end>.*?["\'])' : '(?<end>\s*)';
 
-            var $search = helpers.preg_quote($_search);
+            var $search = $_search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 
             var $currentSubstitute = 0;
 
@@ -773,8 +775,8 @@ module.exports = function () {
                 if ($search.indexOf('\{regex_string\}') !== -1 || $search.indexOf('\{regex_number\}') !== -1) {
                     _lodash2.default.each({ 'regex_string': '[a-zA-Z0-9]+', 'regex_number': '[0-9]+' }, function ($regexValue, $regeName) {
                         $currentSubstitute++;
-                        $search = $search.replace(new RegExp('/\\\{' + $regeName + '\\\}/'), '(?<' + $regeName + '_' + $currentSubstitute + '>' + $regexValue + ')');
-                        $replace = $replace.replace(new RegExp('/{' + $regeName + '\}/'), '${' + $regeName + '_' + $currentSubstitute + '}');
+                        $search = XRegExp.replace($search, XRegExp('/\\\{' + $regeName + '\\\}/'), '(?<' + $regeName + '_' + $currentSubstitute + '>' + $regexValue + ')');
+                        $replace = XRegExp.replace($replace, XRegExp('/{' + $regeName + '\}/'), '${' + $regeName + '_' + $currentSubstitute + '}');
                     });
                     continue;
                 }
@@ -791,7 +793,7 @@ module.exports = function () {
                     return $match['regex_' + $m[1] + '_' + $m[2]];
                 }, $replace);
 
-                return $match.groups['start'] + $replace + $match.groups['end'];
+                return $match['start'] + $replace + $match['end'];
             }, this.givenContent);
 
             if ($currentContent.localeCompare(this.givenContent) !== 0) {

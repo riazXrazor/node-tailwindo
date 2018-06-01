@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.preg_replace_callback = preg_replace_callback;
 exports.preg_quote = preg_quote;
 exports.stripslashes = stripslashes;
+var XRegExp = require('xregexp');
 function preg_replace_callback(pattern, callback, subject, limit) {
   // Perform a regular expression search and replace using a callback
   // 
@@ -15,28 +16,29 @@ function preg_replace_callback(pattern, callback, subject, limit) {
   // *     returns 1: "#FollowFriday @fgribreau @GeekFG"
   // *     example 2: preg_replace_callback("/(\\@[^\\s,\\.]*)/ig",function(matches){return matches[0].toLowerCase();},'#FollowFriday @FGRibreau @GeekFG');
   // *     returns 2: "#FollowFriday @fgribreau @geekfg"
-
   limit = !limit ? -1 : limit;
-
+  // console.log(pattern);
   var _flag = pattern.substr(pattern.lastIndexOf(pattern[0]) + 1),
       _pattern = pattern.substr(1, pattern.lastIndexOf(pattern[0]) - 1),
-      reg = new RegExp(_pattern, _flag),
+      reg = XRegExp(_pattern, _flag),
       rs = null,
       res = [],
       x = 0,
       ret = subject;
-
   if (limit === -1) {
     var tmp = [];
 
     do {
-      tmp = reg.exec(subject);
+      tmp = XRegExp.exec(subject, reg);
+
       if (tmp !== null) {
+        // console.log(subject,reg,tmp);
+        // console.log("-----------------------------------------------")
         res.push(tmp);
       }
     } while (tmp !== null && _flag.indexOf('g') !== -1);
   } else {
-    res.push(reg.exec(subject));
+    res.push(XRegExp.exec(subject, reg));
   }
 
   for (x = res.length - 1; x > -1; x--) {

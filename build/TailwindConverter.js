@@ -781,6 +781,10 @@ module.exports = function () {
                 break;
             }
 
+            // console.log($search)
+            // console.log($replace)
+            // process.exit();
+
             //class=" given given-md something-given-md"
             this.givenContent = helpers.preg_replace_callback('/' + $regexStart + '(?<given>(?<![\-_.\w\d])' + $search + '(?![\-_.\w\d]))' + $regexEnd + '/i', function ($match) {
                 $replace = helpers.preg_replace_callback('/\$\{regex_(\w+)_(\d+)\}/', function ($m) {

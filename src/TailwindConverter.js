@@ -1,4 +1,3 @@
-
 import _ from 'lodash';
 import * as helpers from './helpers';
 
@@ -706,6 +705,10 @@ module.exports = class TailwindConverter{
             }
             break;
         }
+
+        // console.log($search)
+        // console.log($replace)
+        // process.exit();
 
         //class=" given given-md something-given-md"
         this.givenContent = helpers.preg_replace_callback(

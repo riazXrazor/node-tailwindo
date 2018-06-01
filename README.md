@@ -40,7 +40,7 @@ You can also use the short hand `-e vue,php,html` instead of the full `--extensi
 ##### Overwrite the original files
 _Please note this can be considered a destructive action as it will replace the orignal file and will not leave a copy of the original any where._
 ```bash
-$ tailwindo path/to/directory/ --replace=true
+$ tailwindo path/to/directory/ -p
 ```
 
 ##### Convert raw code
@@ -61,7 +61,7 @@ By default this will copy the code into a new file like file.html -> file.tw.htm
 ```bash
 $ tailwindo file.blade.php
 ```
-This option works with the `--replace=true` option
+This option works with the `-p` option
 
 ## Using the package
 
@@ -69,6 +69,18 @@ You can install the package via composer locally in your project folder:
 
 ```bash 
 $ npm i tailwindo
+```
+
+```bash
+Usage: tailwindo <path/to/directory/>
+Options:
+  --version         Show version number                                [boolean]
+  -r, --recursive   Recursively convert a directory                    [boolean]
+  -e, --extensions  Convert different file extensions                   [string]
+  -p, --replace     Overwrite the original files                       [boolean]
+  -?, --help        Show help                                          [boolean]
+
+By Riaz Ali Laskar
 ```
 
 Then use it like this: 

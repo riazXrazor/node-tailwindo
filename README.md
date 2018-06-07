@@ -11,7 +11,7 @@ This tool can convert Boostrap CSS classes in HTML code to equivalent Tailwind C
 ### [Online Bootstrap to Tailwind Converter](http://riazxrazor.in/bootstrap-to-tailwind)
 
 ## Installing `tailwindo` for CLI use
-
+### Requires nodejs version >= 10
 You can install the package via composer globally:
 
 `$ npm i -g tailwindo`

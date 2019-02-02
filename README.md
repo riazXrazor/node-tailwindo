@@ -14,7 +14,7 @@ http://riazxrazor.in/bootstrap-to-tailwind
 
 ## Installing `tailwindo` for CLI use
 ### Requires nodejs version >= 10
-You can install the package via composer globally:
+You can install the package via npm globally:
 
 `$ npm i -g tailwindo`
 
@@ -68,7 +68,7 @@ This option works with the `-p` option
 
 ## Using the package
 
-You can install the package via composer locally in your project folder:
+You can install the package via npm locally in your project folder:
 
 ```bash 
 $ npm i tailwindo

@@ -8,7 +8,7 @@ javascript version of https://github.com/awssat/tailwindo
 
 This tool can convert Boostrap CSS classes in HTML code to equivalent Tailwind CSS classes, still not perfect but good as a helper tool.
 
-### [Online Bootstrap to Tailwind Converter](http://130.61.255.202/bootstrap-to-tailwind)
+### [Online Bootstrap to Tailwind Converter](https://riazxrazor.herokuapp.com/bootstrap-to-tailwind)
 
 [https://riazxrazor.herokuapp.com/bootstrap-to-tailwind](https://riazxrazor.herokuapp.com/bootstrap-to-tailwind)
 

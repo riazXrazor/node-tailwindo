@@ -22,7 +22,7 @@
   "email": "riazcool77@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^3.2.2",
     "lodash": "^4.17.10",
     "pumpify": "^1.5.1",
     "split2": "^2.2.0",
